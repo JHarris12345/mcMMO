@@ -360,7 +360,8 @@ public class mcMMO extends JavaPlugin {
     public void onLoad()
     {
         if(getServer().getPluginManager().getPlugin("WorldGuard") != null) {
-            WorldGuardManager.getInstance().registerFlags();
+            // Deleted this as it prevents the plugin from being plugmanned
+            //WorldGuardManager.getInstance().registerFlags();
         }
     }
 

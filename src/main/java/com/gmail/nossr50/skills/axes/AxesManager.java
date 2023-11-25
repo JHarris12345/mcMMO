@@ -13,6 +13,7 @@ import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.player.NotificationManager;
 import com.gmail.nossr50.util.random.RandomChanceUtil;
 import com.gmail.nossr50.util.skills.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -123,7 +124,22 @@ public class AxesManager extends SkillManager {
     }
 
     public double getImpactDurabilityDamage() {
-        return mcMMO.p.getAdvancedConfig().getImpactDurabilityDamageMultiplier() * RankUtils.getRank(getPlayer(), SubSkillType.AXES_ARMOR_IMPACT);
+        double armorDamage = mcMMO.p.getAdvancedConfig().getImpactDurabilityDamageMultiplier() * RankUtils.getRank(getPlayer(), SubSkillType.AXES_ARMOR_IMPACT);
+        double finalDamage = armorDamage;
+
+        double sharpness = 1;
+        ItemStack hand = getPlayer().getInventory().getItemInMainHand();
+        if (hand != null && hand.getItemMeta() != null) {
+            if (hand.getItemMeta().hasEnchant(Enchantment.DAMAGE_ALL)) {
+                sharpness = hand.getItemMeta().getEnchantLevel(Enchantment.DAMAGE_ALL);
+            }
+        }
+
+        if (sharpness > 1) {
+            finalDamage *= (1 + (2*(sharpness/100)));
+        }
+
+        return finalDamage;
     }
 
     /**
