@@ -38,7 +38,7 @@ public class AxesCommand extends SkillCommand {
     protected void dataCalculations(Player player, float skillValue) {
         // ARMOR IMPACT
         if (canImpact) {
-            impactDamage = UserManager.getPlayer(player).getAxesManager().getImpactDurabilityDamage();
+            impactDamage = UserManager.getPlayer(player).getAxesManager().getImpactDurabilityDamage(false);
         }
 
         // AXE MASTERY

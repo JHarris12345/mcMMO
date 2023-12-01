@@ -112,7 +112,7 @@ public class AxesManager extends SkillManager {
      * @param target The {@link LivingEntity} being affected by Impact
      */
     public void impactCheck(@NotNull LivingEntity target) {
-        double durabilityDamage = getImpactDurabilityDamage();
+        double durabilityDamage = getImpactDurabilityDamage(true);
 
         for (ItemStack armor : target.getEquipment().getArmorContents()) {
             if (armor != null && ItemUtils.isArmor(armor)) {
@@ -123,20 +123,22 @@ public class AxesManager extends SkillManager {
         }
     }
 
-    public double getImpactDurabilityDamage() {
+    public double getImpactDurabilityDamage(boolean applySharpnessBuff) {
         double armorDamage = mcMMO.p.getAdvancedConfig().getImpactDurabilityDamageMultiplier() * RankUtils.getRank(getPlayer(), SubSkillType.AXES_ARMOR_IMPACT);
         double finalDamage = armorDamage;
 
-        double sharpness = 1;
-        ItemStack hand = getPlayer().getInventory().getItemInMainHand();
-        if (hand != null && hand.getItemMeta() != null) {
-            if (hand.getItemMeta().hasEnchant(Enchantment.DAMAGE_ALL)) {
-                sharpness = hand.getItemMeta().getEnchantLevel(Enchantment.DAMAGE_ALL);
+        if (applySharpnessBuff) {
+            double sharpness = 1;
+            ItemStack hand = getPlayer().getInventory().getItemInMainHand();
+            if (hand != null && hand.getItemMeta() != null) {
+                if (hand.getItemMeta().hasEnchant(Enchantment.DAMAGE_ALL)) {
+                    sharpness = hand.getItemMeta().getEnchantLevel(Enchantment.DAMAGE_ALL);
+                }
             }
-        }
 
-        if (sharpness > 1) {
-            finalDamage *= (1 + (2*(sharpness/100)));
+            if (sharpness > 1) {
+                finalDamage *= (1 + (2*(sharpness/100)));
+            }
         }
 
         return finalDamage;
