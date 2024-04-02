@@ -396,6 +396,7 @@ public class TamingManager extends SkillManager {
 
     private void spawnWolf(Location spawnLocation) {
         LivingEntity callOfWildEntity = (LivingEntity) getPlayer().getWorld().spawnEntity(spawnLocation, EntityType.WOLF);
+        callOfWildEntity.setAI(true);
 
         //This is used to prevent XP gains for damaging this entity
         applyMetaDataToCOTWEntity(callOfWildEntity);
