@@ -8,6 +8,7 @@ import com.gmail.nossr50.datatypes.skills.SuperAbilityType;
 import com.gmail.nossr50.datatypes.skills.ToolType;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.skills.SkillManager;
+import com.gmail.nossr50.util.EnchantmentUtils;
 import com.gmail.nossr50.util.ItemUtils;
 import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.player.NotificationManager;
@@ -135,12 +136,13 @@ public class AxesManager extends SkillManager {
         double armorDamage = mcMMO.p.getAdvancedConfig().getImpactDurabilityDamageMultiplier() * RankUtils.getRank(getPlayer(), SubSkillType.AXES_ARMOR_IMPACT);
         double finalDamage = armorDamage;
 
+
         if (applySharpnessBuff) {
             double sharpness = 1;
             ItemStack hand = getPlayer().getInventory().getItemInMainHand();
             if (hand != null && hand.getItemMeta() != null) {
-                if (hand.getItemMeta().hasEnchant(Enchantment.SHARPNESS)) {
-                    sharpness = hand.getItemMeta().getEnchantLevel(Enchantment.SHARPNESS);
+                if (hand.getItemMeta().hasEnchant(EnchantmentUtils.getByName("SHARPNESS"))) {
+                    sharpness = hand.getItemMeta().getEnchantLevel(EnchantmentUtils.getByName("SHARPNESS"));
                 }
             }
 
