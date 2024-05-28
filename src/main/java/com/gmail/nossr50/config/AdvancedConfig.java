@@ -504,8 +504,7 @@ public class AdvancedConfig extends BukkitConfig {
      */
 
 
-    /*public ChatColor getJSONStatHoverElementColor(StatType statType, boolean isPrefix)
-    {
+    /*public ChatColor getJSONStatHoverElementColor(StatType statType, boolean isPrefix) {
         String keyAddress = isPrefix ? "Prefix" : "Value";
         String keyLocation = "Style.JSON.Hover.Details." + StringUtils.getCapitalized(statType.toString()) +"."+keyAddress+".Color";
 
@@ -517,50 +516,41 @@ public class AdvancedConfig extends BukkitConfig {
      *
      * @return the ChatColor for this element
      */
-    /*public ChatColor getJSONStatHoverDetailsColor()
-    {
+    /*public ChatColor getJSONStatHoverDetailsColor() {
         String keyLocation = "Style.JSON.Hover.Details.Header.Color";
         return getChatColorFromKey(keyLocation);
     }
 
-    public boolean isJSONDetailsHeaderBold()
-    {
+    public boolean isJSONDetailsHeaderBold() {
         return config.getBoolean("Style.JSON.Hover.Details.Header.Bold");
     }
 
-    public boolean isJSONDetailsHeaderItalic()
-    {
+    public boolean isJSONDetailsHeaderItalic() {
         return config.getBoolean("Style.JSON.Hover.Details.Header.Italics");
     }
 
-    public boolean isJSONDetailsHeaderUnderlined()
-    {
+    public boolean isJSONDetailsHeaderUnderlined() {
         return config.getBoolean("Style.JSON.Hover.Details.Header.Underlined");
     }
 
-    public ChatColor getJSONStatHoverDescriptionColor()
-    {
+    public ChatColor getJSONStatHoverDescriptionColor() {
         String keyLocation = "Style.JSON.Hover.Details.Description.Color";
         return getChatColorFromKey(keyLocation);
     }
 
-    public boolean isJSONDetailsDescriptionBold()
-    {
+    public boolean isJSONDetailsDescriptionBold() {
         return config.getBoolean("Style.JSON.Hover.Details.Description.Bold");
     }
 
-    public boolean isJSONDetailsDescriptionItalic()
-    {
+    public boolean isJSONDetailsDescriptionItalic() {
         return config.getBoolean("Style.JSON.Hover.Details.Description.Italics");
     }
 
-    public boolean isJSONDetailsDescriptionUnderlined()
-    {
+    public boolean isJSONDetailsDescriptionUnderlined() {
         return config.getBoolean("Style.JSON.Hover.Details.Description.Underlined");
     }
 
-    public ChatColor getJSONActionBarColor(NotificationType notificationType)
-    {
+    public ChatColor getJSONActionBarColor(NotificationType notificationType) {
         return getChatColor(config.getString("Style.JSON.Notification."+notificationType.toString()+".Color"));
     }*/
     private ChatColor getChatColorFromKey(String keyLocation) {
@@ -580,22 +570,19 @@ public class AdvancedConfig extends BukkitConfig {
         return ChatColor.WHITE;
     }
 
-    /*public boolean isJSONStatHoverElementBold(StatType statType, boolean isPrefix)
-    {
+    /*public boolean isJSONStatHoverElementBold(StatType statType, boolean isPrefix) {
         String keyAddress = isPrefix ? "Prefix" : "Value";
         String keyLocation = "Style.JSON.Hover.Details." + StringUtils.getCapitalized(statType.toString()) +"."+keyAddress+".Bold";
         return config.getBoolean(keyLocation);
     }
 
-    public boolean isJSONStatHoverElementItalic(StatType statType, boolean isPrefix)
-    {
+    public boolean isJSONStatHoverElementItalic(StatType statType, boolean isPrefix) {
         String keyAddress = isPrefix ? "Prefix" : "Value";
         String keyLocation = "Style.JSON.Hover.Details." + StringUtils.getCapitalized(statType.toString()) +"."+keyAddress+".Italics";
         return config.getBoolean(keyLocation);
     }
 
-    public boolean isJSONStatHoverElementUnderlined(StatType statType, boolean isPrefix)
-    {
+    public boolean isJSONStatHoverElementUnderlined(StatType statType, boolean isPrefix) {
         String keyAddress = isPrefix ? "Prefix" : "Value";
         String keyLocation = "Style.JSON.Hover.Details." + StringUtils.getCapitalized(statType.toString()) +"."+keyAddress+".Underline";
         return config.getBoolean(keyLocation);
@@ -627,7 +614,11 @@ public class AdvancedConfig extends BukkitConfig {
 
     /* ALCHEMY */
     public int getCatalysisMaxBonusLevel() {
-        return config.getInt("Skills.Alchemy.Catalysis.MaxBonusLevel", 1000);
+        if (mcMMO.isRetroModeEnabled()) {
+            return config.getInt("Skills.Alchemy.Catalysis.MaxBonusLevel.RetroMode", 1000);
+        } else {
+            return config.getInt("Skills.Alchemy.Catalysis.MaxBonusLevel.Standard", 100);
+        }
     }
 
     public double getCatalysisMinSpeed() {
@@ -691,6 +682,15 @@ public class AdvancedConfig extends BukkitConfig {
 
     public double getSkullSplitterModifier() {
         return config.getDouble("Skills.Axes.SkullSplitter.DamageModifier", 2.0D);
+    }
+
+    /* CROSSBOWS */
+    public double getPoweredShotRankDamageMultiplier() {
+        return config.getDouble("Skills.Crossbows.PoweredShot.RankDamageMultiplier", 10.0D);
+    }
+
+    public double getPoweredShotDamageMax() {
+        return config.getDouble("Skills.Archery.SkillShot.MaxDamage", 9.0D);
     }
 
     /* EXCAVATION */

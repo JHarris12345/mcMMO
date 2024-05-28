@@ -35,7 +35,7 @@ public final class ShareHandler {
             return false;
         }
 
-        List<Player> nearMembers = PartyManager.getNearVisibleMembers(mcMMOPlayer);
+        List<Player> nearMembers = mcMMO.p.getPartyManager().getNearVisibleMembers(mcMMOPlayer);
 
         if (nearMembers.isEmpty()) {
             return false;
@@ -44,13 +44,14 @@ public final class ShareHandler {
         nearMembers.add(mcMMOPlayer.getPlayer());
 
         int partySize = nearMembers.size();
-        double shareBonus = Math.min(mcMMO.p.getGeneralConfig().getPartyShareBonusBase() + (partySize * mcMMO.p.getGeneralConfig().getPartyShareBonusIncrease()), mcMMO.p.getGeneralConfig().getPartyShareBonusCap());
+        double shareBonus = Math.min(mcMMO.p.getGeneralConfig().getPartyShareBonusBase()
+                + (partySize * mcMMO.p.getGeneralConfig().getPartyShareBonusIncrease()),
+                mcMMO.p.getGeneralConfig().getPartyShareBonusCap());
         float splitXp = (float) (xp / partySize * shareBonus);
 
         for (Player member : nearMembers) {
             //Profile not loaded
-            if(UserManager.getPlayer(member) == null)
-            {
+            if (UserManager.getPlayer(member) == null) {
                 continue;
             }
 
@@ -87,7 +88,7 @@ public final class ShareHandler {
             return false;
         }
 
-        List<Player> nearMembers = PartyManager.getNearMembers(mcMMOPlayer);
+        List<Player> nearMembers = mcMMO.p.getPartyManager().getNearMembers(mcMMOPlayer);
 
         if (nearMembers.isEmpty()) {
             return false;
@@ -113,8 +114,7 @@ public final class ShareHandler {
                         McMMOPlayer mcMMOMember = UserManager.getPlayer(member);
 
                         //Profile not loaded
-                        if(UserManager.getPlayer(member) == null)
-                        {
+                        if (UserManager.getPlayer(member) == null) {
                             continue;
                         }
 
@@ -159,11 +159,9 @@ public final class ShareHandler {
     public static XPGainReason getSharedXpGainReason(XPGainReason xpGainReason) {
         if (xpGainReason == XPGainReason.PVE) {
             return XPGainReason.SHARED_PVE;
-        }
-        else if (xpGainReason == XPGainReason.PVP) {
+        } else if (xpGainReason == XPGainReason.PVP) {
             return XPGainReason.SHARED_PVP;
-        }
-        else {
+        } else {
             return xpGainReason;
         }
     }

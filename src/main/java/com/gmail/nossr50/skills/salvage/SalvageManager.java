@@ -11,11 +11,11 @@ import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.skills.SkillManager;
 import com.gmail.nossr50.skills.salvage.salvageables.Salvageable;
 import com.gmail.nossr50.util.EventUtils;
+import com.gmail.nossr50.util.ItemUtils;
 import com.gmail.nossr50.util.Misc;
 import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.player.NotificationManager;
-import com.gmail.nossr50.util.random.RandomChanceSkillStatic;
-import com.gmail.nossr50.util.random.RandomChanceUtil;
+import com.gmail.nossr50.util.random.ProbabilityUtil;
 import com.gmail.nossr50.util.skills.RankUtils;
 import com.gmail.nossr50.util.skills.SkillUtils;
 import com.gmail.nossr50.util.sounds.SoundManager;
@@ -63,14 +63,19 @@ public class SalvageManager extends SkillManager {
     }
 
     public void handleSalvage(Location location, ItemStack item) {
-        Player player = getPlayer();
+        final Player player = getPlayer();
 
-        Salvageable salvageable = mcMMO.getSalvageableManager().getSalvageable(item.getType());
-        ItemMeta meta = item.getItemMeta();
-        
-        if (meta != null && meta.isUnbreakable()) {
-            NotificationManager.sendPlayerInformation(player, NotificationType.SUBSKILL_MESSAGE_FAILED, "Anvil.Unbreakable");
-            return;
+        final Salvageable salvageable = mcMMO.getSalvageableManager().getSalvageable(item.getType());
+        final ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            if (meta.hasCustomModelData() && !mcMMO.p.getCustomItemSupportConfig().isCustomSalvageAllowed()) {
+                NotificationManager.sendPlayerInformation(player, NotificationType.SUBSKILL_MESSAGE_FAILED, "Anvil.Salvage.Reject.CustomModelData");
+                return;
+            }
+            if (meta.isUnbreakable()) {
+                NotificationManager.sendPlayerInformation(player, NotificationType.SUBSKILL_MESSAGE_FAILED, "Anvil.Unbreakable");
+                return;
+            }
         }
 
         // Permissions checks on material and item types
@@ -121,7 +126,7 @@ public class SalvageManager extends SkillManager {
 
         for(int x = 0; x < potentialSalvageYield-1; x++) {
 
-            if(RandomChanceUtil.rollDice(chanceOfSuccess, 100)) {
+            if (ProbabilityUtil.isStaticSkillRNGSuccessful(PrimarySkillType.SALVAGE, mmoPlayer, chanceOfSuccess)) {
                 chanceOfSuccess-=3;
                 chanceOfSuccess = Math.max(chanceOfSuccess, 90);
 
@@ -161,10 +166,10 @@ public class SalvageManager extends SkillManager {
         anvilLoc.add(0, .1, 0);
 
         if (enchantBook != null) {
-            Misc.spawnItemTowardsLocation(getPlayer(), anvilLoc.clone(), playerLoc.clone(), enchantBook, vectorSpeed, ItemSpawnReason.SALVAGE_ENCHANTMENT_BOOK);
+            ItemUtils.spawnItemTowardsLocation(getPlayer(), anvilLoc.clone(), playerLoc.clone(), enchantBook, vectorSpeed, ItemSpawnReason.SALVAGE_ENCHANTMENT_BOOK);
         }
 
-        Misc.spawnItemTowardsLocation(getPlayer(), anvilLoc.clone(), playerLoc.clone(), salvageResults, vectorSpeed, ItemSpawnReason.SALVAGE_MATERIALS);
+        ItemUtils.spawnItemTowardsLocation(getPlayer(), anvilLoc.clone(), playerLoc.clone(), salvageResults, vectorSpeed, ItemSpawnReason.SALVAGE_MATERIALS);
 
         // BWONG BWONG BWONG - CLUNK!
         if (mcMMO.p.getGeneralConfig().getSalvageAnvilUseSoundsEnabled()) {
@@ -191,32 +196,8 @@ public class SalvageManager extends SkillManager {
         return RankUtils.getRank(getPlayer(), SubSkillType.SALVAGE_ARCANE_SALVAGE);
     }
 
-    /*public double getExtractFullEnchantChance() {
-        int skillLevel = getSkillLevel();
-
-        for (Tier tier : Tier.values()) {
-            if (skillLevel >= tier.getLevel()) {
-                return tier.getExtractFullEnchantChance();
-            }
-        }
-
-        return 0;
-    }
-
-    public double getExtractPartialEnchantChance() {
-        int skillLevel = getSkillLevel();
-
-        for (Tier tier : Tier.values()) {
-            if (skillLevel >= tier.getLevel()) {
-                return tier.getExtractPartialEnchantChance();
-            }
-        }
-
-        return 0;
-    }*/
-
     public double getExtractFullEnchantChance() {
-        if(Permissions.hasSalvageEnchantBypassPerk(getPlayer()))
+        if (Permissions.hasSalvageEnchantBypassPerk(getPlayer()))
             return 100.0D;
 
         return mcMMO.p.getAdvancedConfig().getArcaneSalvageExtractFullEnchantsChance(getArcaneSalvageRank());
@@ -244,20 +225,21 @@ public class SalvageManager extends SkillManager {
 
             int enchantLevel = enchant.getValue();
 
-            if(!ExperienceConfig.getInstance().allowUnsafeEnchantments()) {
-                if(enchantLevel > enchant.getKey().getMaxLevel()) {
+            if (!ExperienceConfig.getInstance().allowUnsafeEnchantments()) {
+                if (enchantLevel > enchant.getKey().getMaxLevel()) {
                     enchantLevel = enchant.getKey().getMaxLevel();
                 }
             }
 
             if (!Salvage.arcaneSalvageEnchantLoss
                     || Permissions.hasSalvageEnchantBypassPerk(player)
-                    || RandomChanceUtil.checkRandomChanceExecutionSuccess(new RandomChanceSkillStatic(getExtractFullEnchantChance(), getPlayer(), SubSkillType.SALVAGE_ARCANE_SALVAGE))) {
+                    || ProbabilityUtil.isStaticSkillRNGSuccessful(
+                            PrimarySkillType.SALVAGE, mmoPlayer, getExtractFullEnchantChance())) {
                 enchantMeta.addStoredEnchant(enchant.getKey(), enchantLevel, true);
-            }
-            else if (enchantLevel > 1
+            } else if (enchantLevel > 1
                     && Salvage.arcaneSalvageDowngrades
-                    && RandomChanceUtil.checkRandomChanceExecutionSuccess(new RandomChanceSkillStatic(getExtractPartialEnchantChance(), getPlayer(), SubSkillType.SALVAGE_ARCANE_SALVAGE))) {
+                    && ProbabilityUtil.isStaticSkillRNGSuccessful(
+                            PrimarySkillType.SALVAGE, mmoPlayer, getExtractPartialEnchantChance())) {
                 enchantMeta.addStoredEnchant(enchant.getKey(), enchantLevel - 1, true);
                 downgraded = true;
             } else {
@@ -265,12 +247,10 @@ public class SalvageManager extends SkillManager {
             }
         }
 
-        if(failedAllEnchants(arcaneFailureCount, enchants.entrySet().size()))
-        {
+        if (failedAllEnchants(arcaneFailureCount, enchants.entrySet().size())) {
             NotificationManager.sendPlayerInformationChatOnly(player,  "Salvage.Skills.ArcaneFailed");
             return null;
-        } else if(downgraded)
-        {
+        } else if (downgraded) {
             NotificationManager.sendPlayerInformationChatOnly(player,  "Salvage.Skills.ArcanePartial");
         }
 

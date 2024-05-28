@@ -2,7 +2,7 @@ package com.gmail.nossr50.commands.party;
 
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.locale.LocaleLoader;
-import com.gmail.nossr50.party.PartyManager;
+import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.util.player.UserManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,23 +19,22 @@ public class PartyCreateCommand implements CommandExecutor {
                 Player player = (Player) sender;
                 McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
 
-                if(UserManager.getPlayer(player) == null)
-                {
+                if (UserManager.getPlayer(player) == null) {
                     player.sendMessage(LocaleLoader.getString("Profile.PendingLoad"));
                     return true;
                 }
 
                 // Check to see if the party exists, and if it does cancel creating a new party
-                if (PartyManager.checkPartyExistence(player, args[1])) {
+                if (mcMMO.p.getPartyManager().checkPartyExistence(player, args[1])) {
                     return true;
                 }
 
                 // Changing parties
-                if (!PartyManager.changeOrJoinParty(mcMMOPlayer, args[1])) {
+                if (!mcMMO.p.getPartyManager().changeOrJoinParty(mcMMOPlayer, args[1])) {
                     return true;
                 }
 
-                PartyManager.createParty(mcMMOPlayer, args[1], getPassword(args));
+                mcMMO.p.getPartyManager().createParty(mcMMOPlayer, args[1], getPassword(args));
                 return true;
 
             default:

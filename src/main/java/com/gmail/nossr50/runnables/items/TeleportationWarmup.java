@@ -3,7 +3,6 @@ package com.gmail.nossr50.runnables.items;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
-import com.gmail.nossr50.party.PartyManager;
 import com.gmail.nossr50.util.CancellableRunnable;
 import com.gmail.nossr50.util.EventUtils;
 import com.gmail.nossr50.util.Misc;
@@ -32,7 +31,7 @@ public class TeleportationWarmup extends CancellableRunnable {
 
         mcMMOPlayer.setTeleportCommenceLocation(null);
 
-        if (!PartyManager.inSameParty(teleportingPlayer, targetPlayer)) {
+        if (!mcMMO.p.getPartyManager().inSameParty(teleportingPlayer, targetPlayer)) {
             teleportingPlayer.sendMessage(LocaleLoader.getString("Party.NotInYourParty", targetPlayer.getName()));
             return;
         }
@@ -61,8 +60,7 @@ public class TeleportationWarmup extends CancellableRunnable {
                 if (!Permissions.partyTeleportWorld(targetPlayer, targetWorld)) {
                     teleportingPlayer.sendMessage(LocaleLoader.getString("Commands.ptp.NoWorldPermissions", targetWorld.getName()));
                     return;
-                }
-                else if (targetWorld != playerWorld && !Permissions.partyTeleportWorld(teleportingPlayer, targetWorld)) {
+                } else if (targetWorld != playerWorld && !Permissions.partyTeleportWorld(teleportingPlayer, targetWorld)) {
                     teleportingPlayer.sendMessage(LocaleLoader.getString("Commands.ptp.NoWorldPermissions", targetWorld.getName()));
                     return;
                 }
