@@ -136,7 +136,6 @@ public class AxesManager extends SkillManager {
         double armorDamage = mcMMO.p.getAdvancedConfig().getImpactDurabilityDamageMultiplier() * RankUtils.getRank(getPlayer(), SubSkillType.AXES_ARMOR_IMPACT);
         double finalDamage = armorDamage;
 
-
         if (applySharpnessBuff) {
             double sharpness = 1;
             ItemStack hand = getPlayer().getInventory().getItemInMainHand();
