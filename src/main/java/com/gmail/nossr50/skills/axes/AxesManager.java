@@ -139,8 +139,8 @@ public class AxesManager extends SkillManager {
             double sharpness = 1;
             ItemStack hand = getPlayer().getInventory().getItemInMainHand();
             if (hand != null && hand.getItemMeta() != null) {
-                if (hand.getItemMeta().hasEnchant(Enchantment.DAMAGE_ALL)) {
-                    sharpness = hand.getItemMeta().getEnchantLevel(Enchantment.DAMAGE_ALL);
+                if (hand.getItemMeta().hasEnchant(Enchantment.SHARPNESS)) {
+                    sharpness = hand.getItemMeta().getEnchantLevel(Enchantment.SHARPNESS);
                 }
             }
 
