@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class McTopCommand implements TabExecutor {
+public class MctopCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         PrimarySkillType skill = null;
@@ -44,12 +44,6 @@ public class McTopCommand implements TabExecutor {
                     return true;
                 }
 
-                // Check if the command is for Maces but the MC version is not correct
-                if (skill == PrimarySkillType.MACES
-                        && !mcMMO.getCompatibilityManager().getMinecraftGameVersion().isAtLeast(1, 21, 0)) {
-                    return true;
-                }
-
                 display(1, skill, sender, command);
                 return true;
 
@@ -61,12 +55,6 @@ public class McTopCommand implements TabExecutor {
                 skill = extractSkill(sender, args[0]);
 
                 if (skill == null) {
-                    return true;
-                }
-
-                // Check if the command is for Maces but the MC version is not correct
-                if (skill == PrimarySkillType.MACES
-                        && !mcMMO.getCompatibilityManager().getMinecraftGameVersion().isAtLeast(1, 21, 0)) {
                     return true;
                 }
 

@@ -85,11 +85,14 @@ public class PlatformManager {
     }
 
     public String getServerSoftwareStr() {
-        return switch (getServerSoftware()) {
-            case PAPER -> "Paper";
-            case SPIGOT -> "Spigot";
-            default -> "CraftBukkit";
-        };
+        switch(getServerSoftware()) {
+            case PAPER:
+                return "Paper";
+            case SPIGOT:
+                return "Spigot";
+            default:
+                return "CraftBukkit";
+        }
     }
 
     public @Nullable CompatibilityManager getCompatibilityManager() {

@@ -1,13 +1,8 @@
 package com.gmail.nossr50.util;
 
 import com.gmail.nossr50.mcMMO;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
 
 public class EnchantmentMapper {
     private final mcMMO pluginRef;
@@ -25,18 +20,12 @@ public class EnchantmentMapper {
         this.featherFalling = initFeatherFalling();
         this.luckOfTheSea = initLuckOfTheSea();
     }
-    
-    private static @Nullable Enchantment mockSpigotMatch(@NotNull String input) {
-        // Replicates match() behaviour for older versions lacking this API
-        final String filtered = input.toLowerCase(Locale.ROOT).replaceAll("\\s+", "_");
-        final NamespacedKey namespacedKey = NamespacedKey.fromString(filtered);
-        return (namespacedKey != null) ? Registry.ENCHANTMENT.get(namespacedKey) : null;
-    }
 
     private Enchantment initLuckOfTheSea() {
-        if (mockSpigotMatch("luck_of_the_sea") != null) {
-            return mockSpigotMatch("luck_of_the_sea");
-        }
+        // TODO: Make use of match if present
+//        if (Registry.ENCHANTMENT.match("luck_of_the_sea") != null) {
+//            return Registry.ENCHANTMENT.match("luck_of_the_sea");
+//        }
 
         // Look for the enchantment by name
         for (Enchantment enchantment : Registry.ENCHANTMENT) {
@@ -54,9 +43,9 @@ public class EnchantmentMapper {
     }
 
     private Enchantment initFeatherFalling() {
-        if (mockSpigotMatch("feather_falling") != null) {
-            return mockSpigotMatch("feather_falling");
-        }
+//        if (Registry.ENCHANTMENT.match("feather_falling") != null) {
+//            return Registry.ENCHANTMENT.match("feather_falling");
+//        }
 
         // Look for the enchantment by name
         for (Enchantment enchantment : Registry.ENCHANTMENT) {
@@ -74,9 +63,9 @@ public class EnchantmentMapper {
     }
 
     private Enchantment initInfinity() {
-        if (mockSpigotMatch("infinity") != null) {
-            return mockSpigotMatch("infinity");
-        }
+//        if (Registry.ENCHANTMENT.match("infinity") != null) {
+//            return Registry.ENCHANTMENT.match("infinity");
+//        }
 
         // Look for the enchantment by name
         for (Enchantment enchantment : Registry.ENCHANTMENT) {
@@ -94,9 +83,9 @@ public class EnchantmentMapper {
     }
 
     private Enchantment initEfficiency() {
-        if (mockSpigotMatch("efficiency") != null) {
-            return mockSpigotMatch("efficiency");
-        }
+//        if (Registry.ENCHANTMENT.match("efficiency") != null) {
+//            return Registry.ENCHANTMENT.match("efficiency");
+//        }
 
         // Look for the enchantment by name
         for (Enchantment enchantment : Registry.ENCHANTMENT) {
@@ -114,9 +103,9 @@ public class EnchantmentMapper {
     }
 
     private Enchantment initUnbreaking() {
-        if (mockSpigotMatch("unbreaking") != null) {
-            return mockSpigotMatch("unbreaking");
-        }
+//        if (Registry.ENCHANTMENT.match("unbreaking") != null) {
+//            return Registry.ENCHANTMENT.match("unbreaking");
+//        }
 
         // Look for the enchantment by name
         for (Enchantment enchantment : Registry.ENCHANTMENT) {

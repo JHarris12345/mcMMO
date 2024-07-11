@@ -50,12 +50,12 @@ public class SoundConfig extends BukkitConfig {
 
     public float getVolume(SoundType soundType) {
         String key = "Sounds." + soundType.toString() + ".Volume";
-        return (float) config.getDouble(key, 1.0);
+        return (float) config.getDouble(key);
     }
 
     public float getPitch(SoundType soundType) {
         String key = "Sounds." + soundType.toString() + ".Pitch";
-        return (float) config.getDouble(key, 1.0);
+        return (float) config.getDouble(key);
     }
 
     public boolean getIsEnabled(SoundType soundType) {

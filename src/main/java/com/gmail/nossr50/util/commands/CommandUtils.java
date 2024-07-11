@@ -216,14 +216,13 @@ public final class CommandUtils {
         return LocaleLoader.getString("Skills.Stats", LocaleLoader.getString(StringUtils.getCapitalized(skill.toString()) + ".Listener") + " ", profile.getSkillLevel(skill), profile.getSkillXpLevel(skill), profile.getXpToLevel(skill));
     }
 
-    private static void printGroupedSkillData(Player inspectTarget, CommandSender display,
-                                              String header, List<PrimarySkillType> skillGroup) {
+    private static void printGroupedSkillData(Player inspectTarget, CommandSender display, String header, List<PrimarySkillType> skillGroup) {
         if (UserManager.getPlayer(inspectTarget) == null)
             return;
 
-        final PlayerProfile profile = UserManager.getPlayer(inspectTarget).getProfile();
+        PlayerProfile profile = UserManager.getPlayer(inspectTarget).getProfile();
 
-        final List<String> displayData = new ArrayList<>();
+        List<String> displayData = new ArrayList<>();
         displayData.add(header);
 
         for (PrimarySkillType primarySkillType : skillGroup) {

@@ -24,9 +24,6 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import static com.gmail.nossr50.util.random.ProbabilityUtil.isSkillRNGSuccessful;
-import static com.gmail.nossr50.util.skills.SkillUtils.handleArmorDurabilityChange;
-
 public class AxesManager extends SkillManager {
     public AxesManager(McMMOPlayer mcMMOPlayer) {
         super(mcMMOPlayer, PrimarySkillType.AXES);
@@ -89,7 +86,7 @@ public class AxesManager extends SkillManager {
      * @param damage The amount of damage initially dealt by the event
      */
     public double criticalHit(LivingEntity target, double damage) {
-        if (!isSkillRNGSuccessful(SubSkillType.AXES_CRITICAL_STRIKES, mmoPlayer, mmoPlayer.getAttackStrength())) {
+        if (!ProbabilityUtil.isSkillRNGSuccessful(SubSkillType.AXES_CRITICAL_STRIKES, mmoPlayer)) {
             return 0;
         }
 
@@ -128,8 +125,8 @@ public class AxesManager extends SkillManager {
 
         for (ItemStack armor : equipment.getArmorContents()) {
             if (armor != null && ItemUtils.isArmor(armor)) {
-                if (isSkillRNGSuccessful(SubSkillType.AXES_ARMOR_IMPACT, mmoPlayer, mmoPlayer.getAttackStrength())) {
-                    handleArmorDurabilityChange(armor, durabilityDamage, 1);
+                if (ProbabilityUtil.isSkillRNGSuccessful(SubSkillType.AXES_ARMOR_IMPACT, mmoPlayer)) {
+                    SkillUtils.handleArmorDurabilityChange(armor, durabilityDamage, 1);
                 }
             }
         }
@@ -162,15 +159,15 @@ public class AxesManager extends SkillManager {
      * @param target The {@link LivingEntity} being affected by the ability
      */
     public double greaterImpact(@NotNull LivingEntity target) {
-        if (!isSkillRNGSuccessful(SubSkillType.AXES_GREATER_IMPACT, mmoPlayer, mmoPlayer.getAttackStrength())) {
+        //static chance (3rd param)
+        if (!ProbabilityUtil.isSkillRNGSuccessful(SubSkillType.AXES_GREATER_IMPACT, mmoPlayer)) {
             return 0;
         }
 
         Player player = getPlayer();
 
         ParticleEffectUtils.playGreaterImpactEffect(target);
-        target.setVelocity(
-                player.getLocation().getDirection().normalize().multiply(Axes.greaterImpactKnockbackMultiplier));
+        target.setVelocity(player.getLocation().getDirection().normalize().multiply(Axes.greaterImpactKnockbackMultiplier));
 
         if (mmoPlayer.useChatNotifications()) {
             NotificationManager.sendPlayerInformation(player, NotificationType.SUBSKILL_MESSAGE, "Axes.Combat.GI.Proc");
@@ -192,6 +189,6 @@ public class AxesManager extends SkillManager {
      * @param damage The amount of damage initially dealt by the event
      */
     public void skullSplitterCheck(@NotNull LivingEntity target, double damage) {
-        CombatUtils.applyAbilityAoE(getPlayer(), target, (damage / Axes.skullSplitterModifier) * mmoPlayer.getAttackStrength(), skill);
+        CombatUtils.applyAbilityAoE(getPlayer(), target, damage / Axes.skullSplitterModifier, skill);
     }
 }

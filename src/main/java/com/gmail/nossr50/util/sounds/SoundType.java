@@ -16,7 +16,6 @@ public enum SoundType {
     BLEED,
     GLASS,
     ITEM_CONSUMED,
-    CRIPPLE,
     TIRED;
 
     public boolean usesCustomPitch() {

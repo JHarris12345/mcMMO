@@ -22,8 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import static com.gmail.nossr50.util.random.ProbabilityUtil.isSkillRNGSuccessful;
-
 public class UnarmedManager extends SkillManager {
 
     public UnarmedManager(McMMOPlayer mcMMOPlayer) {
@@ -100,8 +98,7 @@ public class UnarmedManager extends SkillManager {
      * @param defender The defending player
      */
     public void disarmCheck(@NotNull Player defender) {
-        if (isSkillRNGSuccessful(SubSkillType.UNARMED_DISARM, mmoPlayer, mmoPlayer.getAttackStrength())
-                && !hasIronGrip(defender)) {
+        if (ProbabilityUtil.isSkillRNGSuccessful(SubSkillType.UNARMED_DISARM, mmoPlayer) && !hasIronGrip(defender)) {
             if (EventUtils.callDisarmEvent(defender).isCancelled()) {
                 return;
             }
@@ -124,7 +121,7 @@ public class UnarmedManager extends SkillManager {
      * Check for arrow deflection.
      */
     public boolean deflectCheck() {
-        if (isSkillRNGSuccessful(SubSkillType.UNARMED_ARROW_DEFLECT, mmoPlayer)) {
+        if (ProbabilityUtil.isSkillRNGSuccessful(SubSkillType.UNARMED_ARROW_DEFLECT, mmoPlayer)) {
             NotificationManager.sendPlayerInformation(getPlayer(), NotificationType.SUBSKILL_MESSAGE, "Combat.ArrowDeflect");
             return true;
         }
@@ -181,7 +178,7 @@ public class UnarmedManager extends SkillManager {
     private boolean hasIronGrip(@NotNull Player defender) {
         if (!Misc.isNPCEntityExcludingVillagers(defender)
                 && Permissions.isSubSkillEnabled(defender, SubSkillType.UNARMED_IRON_GRIP)
-                && isSkillRNGSuccessful(SubSkillType.UNARMED_IRON_GRIP, UserManager.getPlayer(defender))) {
+                && ProbabilityUtil.isSkillRNGSuccessful(SubSkillType.UNARMED_IRON_GRIP, UserManager.getPlayer(defender))) {
             NotificationManager.sendPlayerInformation(defender, NotificationType.SUBSKILL_MESSAGE, "Unarmed.Ability.IronGrip.Defender");
             NotificationManager.sendPlayerInformation(getPlayer(), NotificationType.SUBSKILL_MESSAGE, "Unarmed.Ability.IronGrip.Attacker");
 

@@ -59,8 +59,6 @@ public enum SubSkillType {
 
     /* Maces */
     MACES_MACES_LIMIT_BREAK(10),
-    MACES_CRUSH(4),
-    MACES_CRIPPLE(4),
 
     /* Mining */
     MINING_BIGGER_BOMBS(1),

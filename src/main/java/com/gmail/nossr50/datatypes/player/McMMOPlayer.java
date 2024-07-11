@@ -112,6 +112,7 @@ public class McMMOPlayer implements Identified {
     private int respawnATS;
     private int teleportATS;
     private long databaseATS;
+    private double attackStrength; //captured during arm swing events
     //private int chimeraWingLastUse;
     private Location teleportCommence;
 
@@ -150,6 +151,7 @@ public class McMMOPlayer implements Identified {
         experienceBarManager = new ExperienceBarManager(this);
 
         debugMode = false; //Debug mode helps solve support issues, players can toggle it on or off
+        attackStrength = 1.0D;
 
         this.playerAuthor = new PlayerAuthor(player);
 
@@ -225,9 +227,7 @@ public class McMMOPlayer implements Identified {
                 skillManagers.put(primarySkillType, new WoodcuttingManager(this));
                 break;
             case MACES:
-                if (mcMMO.getCompatibilityManager().getMinecraftGameVersion().isAtLeast(1, 21, 0)) {
-                    skillManagers.put(primarySkillType, new MacesManager(this));
-                }
+                skillManagers.put(primarySkillType, new MacesManager(this));
                 break;
             default:
                 throw new InvalidSkillException("The skill named has no manager! Contact the devs!");
@@ -239,7 +239,7 @@ public class McMMOPlayer implements Identified {
     }
 
     public double getAttackStrength() {
-        return player.getAttackCooldown();
+        return attackStrength;
     }
 
     public @NotNull PrimarySkillType getLastSkillShownScoreboard() {
@@ -1059,12 +1059,9 @@ public class McMMOPlayer implements Identified {
         }
     }
 
-    private void tooTiredMultiple(PrimarySkillType primarySkillType, SubSkillType aSubSkill,
-                                  SuperAbilityType aSuperAbility, SubSkillType bSubSkill, SuperAbilityType bSuperAbility) {
-        String aSuperAbilityCD = LocaleLoader.getString("Skills.TooTired.Named", aSubSkill.getLocaleName(),
-                String.valueOf(calculateTimeRemaining(aSuperAbility)));
-        String bSuperAbilityCD = LocaleLoader.getString("Skills.TooTired.Named", bSubSkill.getLocaleName(),
-                String.valueOf(calculateTimeRemaining(bSuperAbility)));
+    private void tooTiredMultiple(PrimarySkillType primarySkillType, SubSkillType aSubSkill, SuperAbilityType aSuperAbility, SubSkillType bSubSkill, SuperAbilityType bSuperAbility) {
+        String aSuperAbilityCD = LocaleLoader.getString("Skills.TooTired.Named", aSubSkill.getLocaleName(), String.valueOf(calculateTimeRemaining(aSuperAbility)));
+        String bSuperAbilityCD = LocaleLoader.getString("Skills.TooTired.Named", bSubSkill.getLocaleName(), String.valueOf(calculateTimeRemaining(bSuperAbility)));
         String allCDStr = aSuperAbilityCD + ", " + bSuperAbilityCD;
 
         NotificationManager.sendPlayerInformation(player, NotificationType.TOOL, "Skills.TooTired.Extra",
