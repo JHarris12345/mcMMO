@@ -147,7 +147,7 @@ public class AxesManager extends SkillManager {
                     sharpness = hand.getItemMeta().getEnchantLevel(EnchantmentUtils.getByName("SHARPNESS"));
                 }
             }
-            
+
             if (sharpness > 1) {
                 finalDamage *= (1 + (2 * (sharpness / 100)));
             }
