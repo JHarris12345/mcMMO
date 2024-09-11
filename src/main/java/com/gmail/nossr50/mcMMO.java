@@ -348,7 +348,7 @@ public class mcMMO extends JavaPlugin {
     @Override
     public void onLoad() {
         if (getServer().getPluginManager().getPlugin("WorldGuard") != null) {
-            WorldGuardManager.getInstance().registerFlags();
+            //WorldGuardManager.getInstance().registerFlags();
         }
 
         // ProtocolLib
