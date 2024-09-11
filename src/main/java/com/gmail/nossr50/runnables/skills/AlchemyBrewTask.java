@@ -165,7 +165,7 @@ public class AlchemyBrewTask extends CancellableRunnable {
     public void finishImmediately() {
         this.cancel();
 
-        AlchemyPotionBrewer.finishBrewing(brewingStand, mmoPlayer, true);
+        if (this.mmoPlayer != null) AlchemyPotionBrewer.finishBrewing(brewingStand, mmoPlayer, true);
         Alchemy.brewingStandMap.remove(brewingStand.getLocation());
     }
 
