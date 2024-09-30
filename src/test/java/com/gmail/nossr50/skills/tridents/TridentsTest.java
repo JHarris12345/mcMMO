@@ -10,12 +10,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
-import java.util.logging.Logger;
-
-import static java.util.logging.Logger.getLogger;
-
 class TridentsTest extends MMOTestEnvironment {
-    private static final Logger logger = getLogger(TridentsTest.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TridentsTest.class.getName());
 
     TridentsManager tridentsManager;
     ItemStack trident;
@@ -38,6 +34,6 @@ class TridentsTest extends MMOTestEnvironment {
 
     @AfterEach
     void tearDown() {
-        cleanUpStaticMocks();
+        cleanupBaseEnvironment();
     }
 }

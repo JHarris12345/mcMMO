@@ -13,6 +13,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.*;
 
 class ExcavationTest extends MMOTestEnvironment {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ExcavationTest.class.getName());
+
 
     @BeforeEach
     void setUp() throws InvalidSkillException {
@@ -46,13 +48,18 @@ class ExcavationTest extends MMOTestEnvironment {
         when(player.getUniqueId()).thenReturn(playerUUID);
 
         // wire inventory
+        this.playerInventory = Mockito.mock(PlayerInventory.class);
         this.itemInMainHand = new ItemStack(Material.DIAMOND_SHOVEL);
+        when(player.getInventory()).thenReturn(playerInventory);
         when(playerInventory.getItemInMainHand()).thenReturn(itemInMainHand);
+
+        // Set up spy for Excavation Manager
+
     }
 
     @AfterEach
     void tearDown() {
-        cleanUpStaticMocks();
+        cleanupBaseEnvironment();
     }
 
     @Test
