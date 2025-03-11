@@ -32,7 +32,7 @@ public class MetadataConstants {
     public static final @NotNull String METADATA_KEY_ARROW_DISTANCE = "mcMMO: Arrow Distance";
     public static final @NotNull String METADATA_KEY_BONUS_DROPS = "mcMMO: Double Drops";
     public static final @NotNull String METADATA_KEY_DISARMED_ITEM = "mcMMO: Disarmed Item";
-    public static final @NotNull String METADATA_KEY_PLAYER_DATA = "mcMMO: Player Data";
+    public static final @NotNull String METADATA_KEY_PLAYER_DATA = "mcMMO: Player Data"; // Storing player data in meta data is stupid to try and retrieve on every player event
     public static final @NotNull String METADATA_KEY_DATABASE_COMMAND = "mcMMO: Processing Database Command";
     // the value of these two keys have "furnace" to keep supporting legacy data
     public static final @NotNull String METADATA_KEY_CONTAINER_UUID_MOST_SIG = "furnace_uuid_most_sig";
