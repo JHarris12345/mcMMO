@@ -764,13 +764,10 @@ public class PlayerListener implements Listener {
         }
 
         //Profile not loaded
-        if (UserManager.getPlayer(player) == null) {
+        McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
+        if (mcMMOPlayer == null) {
             return;
         }
-
-        McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
-        if (mcMMOPlayer == null)
-            return;
 
         ItemStack heldItem = player.getInventory().getItemInMainHand();
 

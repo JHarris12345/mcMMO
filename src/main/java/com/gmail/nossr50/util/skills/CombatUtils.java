@@ -94,7 +94,7 @@ public final class CombatUtils {
             swordsManager.processRupture(target);
         }
 
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.SWORDS);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.SWORDS, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -144,7 +144,7 @@ public final class CombatUtils {
         }
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.TRIDENTS);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.TRIDENTS, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -174,7 +174,7 @@ public final class CombatUtils {
         }
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.TRIDENTS);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.TRIDENTS, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -206,7 +206,7 @@ public final class CombatUtils {
         double forceMultiplier = 1.0;
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.CROSSBOWS, forceMultiplier * distanceMultiplier);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.CROSSBOWS, forceMultiplier * distanceMultiplier, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer,
                 "Distance Multiplier: "+distanceMultiplier,
@@ -252,7 +252,7 @@ public final class CombatUtils {
             macesManager.processCripple(target);
         }
 
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.MACES);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.MACES, event.getFinalDamage());
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
 
@@ -300,7 +300,7 @@ public final class CombatUtils {
         }
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.AXES);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.AXES, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -343,7 +343,7 @@ public final class CombatUtils {
         }
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.UNARMED);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.UNARMED, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -377,7 +377,7 @@ public final class CombatUtils {
             }
 
             event.setDamage(boostedDamage);
-            processCombatXP(mcMMOPlayer, target, PrimarySkillType.TAMING, 3);
+            processCombatXP(mcMMOPlayer, target, PrimarySkillType.TAMING, 3, event.getFinalDamage());
         }
 
     }
@@ -422,7 +422,7 @@ public final class CombatUtils {
             forceMultiplier = arrow.getMetadata(MetadataConstants.METADATA_KEY_BOW_FORCE).get(0).asDouble();
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.ARCHERY, forceMultiplier * distanceMultiplier);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.ARCHERY, forceMultiplier * distanceMultiplier, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer,
                 "Distance Multiplier: "+distanceMultiplier,
@@ -838,8 +838,8 @@ public final class CombatUtils {
      * @param target The defending entity
      * @param primarySkillType The skill being used
      */
-    public static void processCombatXP(@NotNull McMMOPlayer mcMMOPlayer, @NotNull LivingEntity target, @NotNull PrimarySkillType primarySkillType) {
-        processCombatXP(mcMMOPlayer, target, primarySkillType, 1.0);
+    public static void processCombatXP(@NotNull McMMOPlayer mcMMOPlayer, @NotNull LivingEntity target, @NotNull PrimarySkillType primarySkillType, double damage) {
+        processCombatXP(mcMMOPlayer, target, primarySkillType, 1.0, damage);
     }
 
     /**
@@ -853,7 +853,8 @@ public final class CombatUtils {
     public static void processCombatXP(@NotNull McMMOPlayer mcMMOPlayer,
                                        @NotNull LivingEntity target,
                                        @NotNull PrimarySkillType primarySkillType,
-                                       double multiplier) {
+                                       double multiplier,
+                                       double damage) {
         double baseXP = 0;
         XPGainReason xpGainReason;
 
@@ -914,7 +915,7 @@ public final class CombatUtils {
         baseXP *= multiplier;
 
         if (baseXP > 0) {
-            mcMMO.p.getFoliaLib().getImpl().runAtEntity(target, new AwardCombatXpTask(mcMMOPlayer, primarySkillType, baseXP, target, xpGainReason));
+            mcMMO.p.getFoliaLib().getImpl().runAtEntity(target, new AwardCombatXpTask(mcMMOPlayer, primarySkillType, baseXP, target, xpGainReason, damage));
         }
     }
 

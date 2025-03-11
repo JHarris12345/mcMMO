@@ -48,8 +48,8 @@ public final class ExperienceAPI {
      * @deprecated Draft API
      */
     @Deprecated
-    public static void addCombatXP(McMMOPlayer mcMMOPlayer, LivingEntity target, PrimarySkillType primarySkillType, double multiplier) {
-        CombatUtils.processCombatXP(mcMMOPlayer, target, primarySkillType, multiplier);
+    public static void addCombatXP(McMMOPlayer mcMMOPlayer, LivingEntity target, PrimarySkillType primarySkillType, double multiplier, double damage) {
+        CombatUtils.processCombatXP(mcMMOPlayer, target, primarySkillType, multiplier, damage);
     }
 
     /**
@@ -62,8 +62,8 @@ public final class ExperienceAPI {
      * @deprecated Draft API
      */
     @Deprecated
-    public static void addCombatXP(McMMOPlayer mcMMOPlayer, LivingEntity target, PrimarySkillType primarySkillType) {
-        CombatUtils.processCombatXP(mcMMOPlayer, target, primarySkillType);
+    public static void addCombatXP(McMMOPlayer mcMMOPlayer, LivingEntity target, PrimarySkillType primarySkillType, double damage) {
+        CombatUtils.processCombatXP(mcMMOPlayer, target, primarySkillType, damage);
     }
 
     /**

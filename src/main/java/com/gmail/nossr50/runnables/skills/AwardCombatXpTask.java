@@ -16,20 +16,21 @@ public class AwardCombatXpTask extends CancellableRunnable {
     private final LivingEntity target;
     private final XPGainReason xpGainReason;
     private final double baseHealth;
+    private double damage;
 
-    public AwardCombatXpTask(McMMOPlayer mcMMOPlayer, PrimarySkillType primarySkillType, double baseXp, LivingEntity target, XPGainReason xpGainReason) {
+    public AwardCombatXpTask(McMMOPlayer mcMMOPlayer, PrimarySkillType primarySkillType, double baseXp, LivingEntity target, XPGainReason xpGainReason, double damage) {
         this.mcMMOPlayer = mcMMOPlayer;
         this.primarySkillType = primarySkillType;
         this.baseXp = baseXp;
         this.target = target;
         this.xpGainReason = xpGainReason;
+        this.damage = damage;
         baseHealth = target.getHealth();
     }
 
     @Override
     public void run() {
         double health = target.getHealth();
-        double damage = baseHealth - health;
 
         // May avoid negative xp, we don't know what other plugins do with the entity health
         if (damage <= 0) {
