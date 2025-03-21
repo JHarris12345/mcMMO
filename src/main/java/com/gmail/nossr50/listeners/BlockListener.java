@@ -50,8 +50,10 @@ public class BlockListener implements Listener {
     public void onBlockDropItemEvent(BlockDropItemEvent event) {
         //Make sure we clean up metadata on these blocks
         if (event.isCancelled()) {
-            if (event.getBlock().hasMetadata(MetadataConstants.METADATA_KEY_BONUS_DROPS))
+            if (event.getBlock().hasMetadata(MetadataConstants.METADATA_KEY_BONUS_DROPS)) {
                 event.getBlock().removeMetadata(MetadataConstants.METADATA_KEY_BONUS_DROPS, plugin);
+            }
+
             return;
         }
 
@@ -85,6 +87,7 @@ public class BlockListener implements Listener {
         if (blockCount <= 1) {
             for(Item item : event.getItems()) {
                 ItemStack is = new ItemStack(item.getItemStack());
+                System.out.println(is.getType());
 
                 if (is.getAmount() <= 0)
                     continue;
