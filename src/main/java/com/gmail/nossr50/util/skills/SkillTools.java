@@ -10,6 +10,8 @@ import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.text.StringUtils;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -20,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class SkillTools {
     private final mcMMO pluginRef;
@@ -43,6 +46,9 @@ public class SkillTools {
     // The map below is for the super abilities which require readying a tool, its everything except blast mining
     private final ImmutableMap<PrimarySkillType, SuperAbilityType> mainActivatedAbilityChildMap;
     private final ImmutableMap<PrimarySkillType, ToolType> primarySkillToolMap;
+
+    // A cache for if a player has permissions for a skill so we don't have to look up the player's permissions constantly (it's laggy)
+    Cache<UUID, HashMap<PrimarySkillType, Boolean>> cachedSkillPermissions = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
     static {
         ArrayList<PrimarySkillType> tempNonChildSkills = new ArrayList<>();
@@ -368,7 +374,18 @@ public class SkillTools {
     }
 
     public boolean doesPlayerHaveSkillPermission(Player player, PrimarySkillType primarySkillType) {
-        return Permissions.skillEnabled(player, primarySkillType);
+        HashMap<PrimarySkillType, Boolean> permissionCache = cachedSkillPermissions.getIfPresent(player.getUniqueId());
+        if (permissionCache == null) permissionCache = new HashMap<>();
+
+        Boolean bool = permissionCache.getOrDefault(primarySkillType, null);
+
+        if (bool == null) {
+            bool = Permissions.skillEnabled(player, primarySkillType);
+            permissionCache.put(primarySkillType, bool);
+            cachedSkillPermissions.put(player.getUniqueId(), permissionCache);
+        }
+
+        return bool;
     }
 
     public boolean canCombatSkillsTrigger(PrimarySkillType primarySkillType, Entity target) {
