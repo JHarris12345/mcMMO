@@ -87,7 +87,6 @@ public class BlockListener implements Listener {
         if (blockCount <= 1) {
             for(Item item : event.getItems()) {
                 ItemStack is = new ItemStack(item.getItemStack());
-                System.out.println(is.getType());
 
                 if (is.getAmount() <= 0)
                     continue;
