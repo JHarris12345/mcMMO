@@ -48,7 +48,7 @@ public class SkillTools {
     private final ImmutableMap<PrimarySkillType, ToolType> primarySkillToolMap;
 
     // A cache for if a player has permissions for a skill so we don't have to look up the player's permissions constantly (it's laggy)
-    Cache<UUID, HashMap<PrimarySkillType, Boolean>> cachedSkillPermissions = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
+    public static Cache<UUID, HashMap<PrimarySkillType, Boolean>> cachedSkillPermissions = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
     static {
         ArrayList<PrimarySkillType> tempNonChildSkills = new ArrayList<>();

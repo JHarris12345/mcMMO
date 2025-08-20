@@ -25,6 +25,7 @@ import com.gmail.nossr50.util.*;
 import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
 import com.gmail.nossr50.util.skills.RankUtils;
+import com.gmail.nossr50.util.skills.SkillTools;
 import com.gmail.nossr50.util.skills.SkillUtils;
 import com.gmail.nossr50.util.sounds.SoundManager;
 import com.gmail.nossr50.util.sounds.SoundType;
@@ -218,6 +219,9 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
+
+        // Remove them from the cached skill permissions map as permissions can change from world to world and we don't want to use a cache
+        SkillTools.cachedSkillPermissions.invalidate(player.getUniqueId());
 
         if (!UserManager.hasPlayerDataKey(player)) {
             return;
