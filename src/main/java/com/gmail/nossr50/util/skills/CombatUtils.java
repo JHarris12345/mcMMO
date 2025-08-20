@@ -753,6 +753,8 @@ public final class CombatUtils {
             removeIgnoreDamageMetadata(target);
         if (!wasProcessing)
             processingNoInvulnDamage = false;
+
+        mcMMO.p.getLogger().info("Dealt no invulnerability tick damage to " + target.getName() + " of " + damage);
     }
 
     public static void removeIgnoreDamageMetadata(@NotNull LivingEntity target) {
