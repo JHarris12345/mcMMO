@@ -25,6 +25,7 @@ import com.gmail.nossr50.util.*;
 import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
 import com.gmail.nossr50.util.skills.RankUtils;
+import com.gmail.nossr50.util.skills.SkillTools;
 import com.gmail.nossr50.util.skills.SkillUtils;
 import com.gmail.nossr50.util.sounds.SoundManager;
 import com.gmail.nossr50.util.sounds.SoundType;
@@ -219,6 +220,9 @@ public class PlayerListener implements Listener {
     public void onPlayerWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
 
+        // Remove them from the cached skill permissions map as permissions can change from world to world and we don't want to use a cache
+        SkillTools.cachedSkillPermissions.invalidate(player.getUniqueId());
+
         if (!UserManager.hasPlayerDataKey(player)) {
             return;
         }
@@ -255,14 +259,15 @@ public class PlayerListener implements Listener {
                 return;
         }
 
-        Item drop = event.getItemDrop();
-        ItemStack dropStack = drop.getItemStack();
 
-        if (ItemUtils.isSharable(dropStack)) {
-            drop.setMetadata(MetadataConstants.METADATA_KEY_TRACKED_ITEM, MetadataConstants.MCMMO_METADATA_VALUE);
-        }
+        // TODO: This sharing item system seems very unoptimized, temporarily disabling
+        /*if (ItemUtils.isSharable(event.getItemDrop().getItemStack())) {
+            event.getItemDrop().getItemStack().setMetadata(
+                    MetadataConstants.METADATA_KEY_TRACKED_ITEM,
+                    MetadataConstants.MCMMO_METADATA_VALUE);
+        }*/
 
-        SkillUtils.removeAbilityBuff(dropStack);
+        SkillUtils.removeAbilityBuff(event.getItemDrop().getItemStack());
     }
 
     /**
@@ -312,7 +317,7 @@ public class PlayerListener implements Listener {
 
                         ItemStack replacementCatch = new ItemStack(Material.SALMON, 1);
 
-                        McMMOReplaceVanillaTreasureEvent replaceVanillaTreasureEvent = new McMMOReplaceVanillaTreasureEvent(fishingCatch, replacementCatch);
+                        McMMOReplaceVanillaTreasureEvent replaceVanillaTreasureEvent = new McMMOReplaceVanillaTreasureEvent(fishingCatch, replacementCatch, player);
                         Bukkit.getPluginManager().callEvent(replaceVanillaTreasureEvent);
 
                         //Replace
@@ -494,8 +499,7 @@ public class PlayerListener implements Listener {
                 return;
             }
 
-            Item drop = event.getItem();
-            ItemStack dropStack = drop.getItemStack();
+            final Item drop = event.getItem();
 
             //Remove tracking
             if (drop.hasMetadata(MetadataConstants.METADATA_KEY_TRACKED_ARROW)) {
@@ -510,13 +514,14 @@ public class PlayerListener implements Listener {
                 return;
             }
 
-            if (!drop.hasMetadata(MetadataConstants.METADATA_KEY_TRACKED_ITEM) && mcMMOPlayer.inParty() && ItemUtils.isSharable(dropStack)) {
+            // TODO: Temporarily disabling sharing items...
+            /*if (!drop.hasMetadata(MetadataConstants.METADATA_KEY_TRACKED_ITEM) && mcMMOPlayer.inParty() && ItemUtils.isSharable(dropStack)) {
                 event.setCancelled(ShareHandler.handleItemShare(drop, mcMMOPlayer));
 
                 if (event.isCancelled()) {
                     SoundManager.sendSound(player, player.getLocation(), SoundType.POP);
                 }
-            }
+            }*/
 
             /*if (player.getInventory().getItemInMainHand().getType() == Material.AIR) {
                 Unarmed.handleItemPickup(player, event);
@@ -763,13 +768,10 @@ public class PlayerListener implements Listener {
         }
 
         //Profile not loaded
-        if (UserManager.getPlayer(player) == null) {
+        McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
+        if (mcMMOPlayer == null) {
             return;
         }
-
-        McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
-        if (mcMMOPlayer == null)
-            return;
 
         ItemStack heldItem = player.getInventory().getItemInMainHand();
 

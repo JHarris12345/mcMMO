@@ -113,6 +113,11 @@ public final class Permissions {
     public static boolean lucky(Permissible permissible, PrimarySkillType skill) { return permissible.hasPermission("mcmmo.perks.lucky." + skill.toString().toLowerCase(Locale.ENGLISH)); }
 
     /* XP PERKS */
+    public static boolean sextupleXp(Permissible permissible, PrimarySkillType skill) {
+        return permissible.hasPermission("mcmmo.perks.xp.sextuple.all")
+                || permissible.hasPermission("mcmmo.perks.xp.sextuple." + skill.toString().toLowerCase(Locale.ENGLISH));
+    }
+
     public static boolean quadrupleXp(Permissible permissible, PrimarySkillType skill) { 
         return permissible.hasPermission("mcmmo.perks.xp.quadruple.all")
             || permissible.hasPermission("mcmmo.perks.xp.quadruple." + skill.toString().toLowerCase(Locale.ENGLISH)); 

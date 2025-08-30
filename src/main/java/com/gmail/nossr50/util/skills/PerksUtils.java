@@ -55,6 +55,8 @@ public final class PerksUtils {
             }
 
              modifier = ExperienceConfig.getInstance().getCustomXpPerkBoost();
+        } else if (Permissions.sextupleXp(player, skill)) {
+            modifier = 6;
         } else if (Permissions.quadrupleXp(player, skill)) {
             modifier = 4;
         } else if (Permissions.tripleXp(player, skill)) {

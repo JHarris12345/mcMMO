@@ -10,6 +10,8 @@ import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.text.StringUtils;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -20,11 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class SkillTools {
     private final mcMMO pluginRef;
-
-    //TODO: Figure out which ones we don't need, this was copy pasted from a diff branch
+    // TODO: Java has immutable types now, switch to those
+    // TODO: Figure out which ones we don't need, this was copy pasted from a diff branch
     public final @NotNull ImmutableList<String> LOCALIZED_SKILL_NAMES;
     public final @NotNull ImmutableList<String> FORMATTED_SUBSKILL_NAMES;
     public final @NotNull ImmutableSet<String> EXACT_SUBSKILL_NAMES;
@@ -43,6 +46,9 @@ public class SkillTools {
     // The map below is for the super abilities which require readying a tool, its everything except blast mining
     private final ImmutableMap<PrimarySkillType, SuperAbilityType> mainActivatedAbilityChildMap;
     private final ImmutableMap<PrimarySkillType, ToolType> primarySkillToolMap;
+
+    // A cache for if a player has permissions for a skill so we don't have to look up the player's permissions constantly (it's laggy)
+    public static Cache<UUID, HashMap<PrimarySkillType, Boolean>> cachedSkillPermissions = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
     static {
         ArrayList<PrimarySkillType> tempNonChildSkills = new ArrayList<>();
@@ -156,14 +162,28 @@ public class SkillTools {
          * Build categorized skill lists
          */
 
-        COMBAT_SKILLS = ImmutableList.of(
-                PrimarySkillType.ARCHERY,
-                PrimarySkillType.AXES,
-                PrimarySkillType.CROSSBOWS,
-                PrimarySkillType.SWORDS,
-                PrimarySkillType.TAMING,
-                PrimarySkillType.TRIDENTS,
-                PrimarySkillType.UNARMED);
+        // We are in a game version with Maces
+        if (mcMMO.getCompatibilityManager().getMinecraftGameVersion().isAtLeast(1, 21, 0)) {
+            COMBAT_SKILLS = ImmutableList.of(
+                    PrimarySkillType.ARCHERY,
+                    PrimarySkillType.AXES,
+                    PrimarySkillType.CROSSBOWS,
+                    PrimarySkillType.MACES,
+                    PrimarySkillType.SWORDS,
+                    PrimarySkillType.TAMING,
+                    PrimarySkillType.TRIDENTS,
+                    PrimarySkillType.UNARMED);
+        } else {
+            // No Maces in this version
+            COMBAT_SKILLS = ImmutableList.of(
+                    PrimarySkillType.ARCHERY,
+                    PrimarySkillType.AXES,
+                    PrimarySkillType.CROSSBOWS,
+                    PrimarySkillType.SWORDS,
+                    PrimarySkillType.TAMING,
+                    PrimarySkillType.TRIDENTS,
+                    PrimarySkillType.UNARMED);
+        }
         GATHERING_SKILLS = ImmutableList.of(
                 PrimarySkillType.EXCAVATION,
                 PrimarySkillType.FISHING,
@@ -354,7 +374,18 @@ public class SkillTools {
     }
 
     public boolean doesPlayerHaveSkillPermission(Player player, PrimarySkillType primarySkillType) {
-        return Permissions.skillEnabled(player, primarySkillType);
+        HashMap<PrimarySkillType, Boolean> permissionCache = cachedSkillPermissions.getIfPresent(player.getUniqueId());
+        if (permissionCache == null) permissionCache = new HashMap<>();
+
+        Boolean bool = permissionCache.getOrDefault(primarySkillType, null);
+
+        if (bool == null) {
+            bool = Permissions.skillEnabled(player, primarySkillType);
+            permissionCache.put(primarySkillType, bool);
+            cachedSkillPermissions.put(player.getUniqueId(), permissionCache);
+        }
+
+        return bool;
     }
 
     public boolean canCombatSkillsTrigger(PrimarySkillType primarySkillType, Entity target) {
@@ -371,26 +402,6 @@ public class SkillTools {
 
     public int getSuperAbilityMaxLength(SuperAbilityType superAbilityType) {
         return pluginRef.getGeneralConfig().getMaxLength(superAbilityType);
-    }
-
-    public String getSuperAbilityOnLocaleKey(SuperAbilityType superAbilityType) {
-        return "SuperAbility." + StringUtils.getPrettyCamelCaseName(superAbilityType) + ".On";
-    }
-
-    public String getSuperAbilityOffLocaleKey(SuperAbilityType superAbilityType) {
-        return "SuperAbility." + StringUtils.getPrettyCamelCaseName(superAbilityType) + ".Off";
-    }
-
-    public String getSuperAbilityOtherPlayerActivationLocaleKey(SuperAbilityType superAbilityType) {
-        return "SuperAbility." + StringUtils.getPrettyCamelCaseName(superAbilityType) + ".Other.On";
-    }
-
-    public String getSuperAbilityOtherPlayerDeactivationLocaleKey(SuperAbilityType superAbilityType) {
-        return "SuperAbility." + StringUtils.getPrettyCamelCaseName(superAbilityType) + "Other.Off";
-    }
-
-    public String getSuperAbilityRefreshedLocaleKey(SuperAbilityType superAbilityType) {
-        return "SuperAbility." + StringUtils.getPrettyCamelCaseName(superAbilityType) + ".Refresh";
     }
 
     public int getLevelCap(@NotNull PrimarySkillType primarySkillType) {
