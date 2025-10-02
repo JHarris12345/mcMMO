@@ -344,7 +344,7 @@ public class mcMMO extends JavaPlugin {
 
         // ProtocolLib
         // protocolLibManager = new ProtocolLibManager(this);
-    }*/
+    }
 
     /**
      * Things to be run when the plugin is disabled.

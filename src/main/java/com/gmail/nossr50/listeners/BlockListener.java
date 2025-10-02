@@ -50,10 +50,8 @@ public class BlockListener implements Listener {
     public void onBlockDropItemEvent(BlockDropItemEvent event) {
         //Make sure we clean up metadata on these blocks
         if (event.isCancelled()) {
-            if (event.getBlock().hasMetadata(MetadataConstants.METADATA_KEY_BONUS_DROPS)) {
+            if (event.getBlock().hasMetadata(MetadataConstants.METADATA_KEY_BONUS_DROPS))
                 event.getBlock().removeMetadata(MetadataConstants.METADATA_KEY_BONUS_DROPS, plugin);
-            }
-
             return;
         }
 
