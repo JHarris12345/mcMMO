@@ -21,6 +21,7 @@ import com.gmail.nossr50.skills.unarmed.UnarmedManager;
 import com.gmail.nossr50.util.*;
 import com.gmail.nossr50.util.player.NotificationManager;
 import com.gmail.nossr50.util.player.UserManager;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.attribute.AttributeInstance;
@@ -31,6 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,7 +96,7 @@ public final class CombatUtils {
             swordsManager.processRupture(target);
         }
 
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.SWORDS);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.SWORDS, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -144,7 +146,7 @@ public final class CombatUtils {
         }
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.TRIDENTS);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.TRIDENTS, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -174,7 +176,7 @@ public final class CombatUtils {
         }
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.TRIDENTS);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.TRIDENTS, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -252,7 +254,7 @@ public final class CombatUtils {
             macesManager.processCripple(target);
         }
 
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.MACES);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.MACES, event.getFinalDamage());
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
 
@@ -300,7 +302,7 @@ public final class CombatUtils {
         }
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.AXES);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.AXES, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -343,7 +345,7 @@ public final class CombatUtils {
         }
 
         event.setDamage(boostedDamage);
-        processCombatXP(mcMMOPlayer, target, PrimarySkillType.UNARMED);
+        processCombatXP(mcMMOPlayer, target, PrimarySkillType.UNARMED, event.getFinalDamage());
 
         printFinalDamageDebug(player, event, mcMMOPlayer);
     }
@@ -838,8 +840,8 @@ public final class CombatUtils {
      * @param target The defending entity
      * @param primarySkillType The skill being used
      */
-    public static void processCombatXP(@NotNull McMMOPlayer mcMMOPlayer, @NotNull LivingEntity target, @NotNull PrimarySkillType primarySkillType) {
-        processCombatXP(mcMMOPlayer, target, primarySkillType, 1.0);
+    public static void processCombatXP(@NotNull McMMOPlayer mcMMOPlayer, @NotNull LivingEntity target, @NotNull PrimarySkillType primarySkillType, double damage) {
+        processCombatXP(mcMMOPlayer, target, primarySkillType, 1.0, damage);
     }
 
     /**
@@ -853,7 +855,8 @@ public final class CombatUtils {
     public static void processCombatXP(@NotNull McMMOPlayer mcMMOPlayer,
                                        @NotNull LivingEntity target,
                                        @NotNull PrimarySkillType primarySkillType,
-                                       double multiplier) {
+                                       double multiplier,
+                                       double damage) {
         double baseXP = 0;
         XPGainReason xpGainReason;
 
@@ -914,7 +917,7 @@ public final class CombatUtils {
         baseXP *= multiplier;
 
         if (baseXP > 0) {
-            mcMMO.p.getFoliaLib().getImpl().runAtEntity(target, new AwardCombatXpTask(mcMMOPlayer, primarySkillType, baseXP, target, xpGainReason));
+            mcMMO.p.getFoliaLib().getImpl().runAtEntity(target, new AwardCombatXpTask(mcMMOPlayer, primarySkillType, baseXP, target, xpGainReason, damage));
         }
     }
 

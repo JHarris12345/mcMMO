@@ -55,25 +55,8 @@ public final class ExperienceAPI {
      * @deprecated Draft API
      */
     @Deprecated
-    public static void addCombatXP(McMMOPlayer mmoPlayer, LivingEntity target,
-            PrimarySkillType primarySkillType,
-            double multiplier) {
-        CombatUtils.processCombatXP(mmoPlayer, target, primarySkillType, multiplier);
-    }
-
-    /**
-     * Start the task that gives combat XP. Processes combat XP like mcMMO normally would, so mcMMO
-     * will check whether the entity should reward XP when giving out the XP
-     *
-     * @param mmoPlayer The attacking player
-     * @param target The defending entity
-     * @param primarySkillType The skill being used
-     * @deprecated Draft API
-     */
-    @Deprecated
-    public static void addCombatXP(McMMOPlayer mmoPlayer, LivingEntity target,
-            PrimarySkillType primarySkillType) {
-        CombatUtils.processCombatXP(mmoPlayer, target, primarySkillType);
+    public static void addCombatXP(McMMOPlayer mcMMOPlayer, LivingEntity target, PrimarySkillType primarySkillType, double damage) {
+        CombatUtils.processCombatXP(mcMMOPlayer, target, primarySkillType, damage);
     }
 
     /**
