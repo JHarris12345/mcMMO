@@ -118,7 +118,7 @@ public class AxesManager extends SkillManager {
      * @param target The {@link LivingEntity} being affected by Impact
      */
     public void impactCheck(@NotNull LivingEntity target) {
-        double durabilityDamage = getImpactDurabilityDamage();
+        double durabilityDamage = getImpactDurabilityDamage(true);
         final EntityEquipment equipment = target.getEquipment();
 
         if (equipment == null) {

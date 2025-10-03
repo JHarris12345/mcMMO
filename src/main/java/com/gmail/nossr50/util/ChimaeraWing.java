@@ -105,7 +105,7 @@ public final class ChimaeraWing {
                         NotificationType.REQUIREMENTS_NOT_MET, "Item.ChimaeraWing.Fail");
                 player.setVelocity(new Vector(0, 0.5D, 0));
                 final int dmg = Misc.getRandom().nextInt((int) (player.getHealth() - 10));
-                CombatUtils.safeDealDamage(player, dmg);
+                CombatUtils.dealDamage(player, dmg);
                 mmoPlayer.actualizeChimeraWingLastUse();
                 return;
             }
