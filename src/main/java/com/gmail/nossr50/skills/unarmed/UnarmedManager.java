@@ -1,8 +1,6 @@
 package com.gmail.nossr50.skills.unarmed;
 
 import static com.gmail.nossr50.util.random.ProbabilityUtil.isSkillRNGSuccessful;
-import static org.bukkit.Material.INFESTED_STONE_BRICKS;
-import static org.bukkit.Material.STONE_BRICKS;
 
 import com.gmail.nossr50.api.ItemSpawnReason;
 import com.gmail.nossr50.datatypes.interactions.NotificationType;
@@ -24,7 +22,6 @@ import com.gmail.nossr50.util.random.ProbabilityUtil;
 import com.gmail.nossr50.util.skills.RankUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -32,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class UnarmedManager extends SkillManager {
+    public static final double BERSERK_DMG_MODIFIER = 1.5;
 
     public UnarmedManager(McMMOPlayer mmoPlayer) {
         super(mmoPlayer, PrimarySkillType.UNARMED);
@@ -118,10 +116,22 @@ public class UnarmedManager extends SkillManager {
      * Check for disarm.
      *
      * @param defender The defending player
+     * @deprecated use {@link #disarmCheck(Player, double)} instead; this overload reads the live
+     * attack cooldown, which is unreliable during damage events on Paper 26.1.2+
      */
+    @Deprecated(forRemoval = true, since = "2.3.000")
     public void disarmCheck(@NotNull Player defender) {
-        if (isSkillRNGSuccessful(SubSkillType.UNARMED_DISARM, mmoPlayer,
-                mmoPlayer.getAttackStrength())
+        disarmCheck(defender, mmoPlayer.getAttackStrength());
+    }
+
+    /**
+     * Check for disarm.
+     *
+     * @param defender The defending player
+     * @param attackStrengthScale the committed attack strength of the hit, from 0.0 to 1.0
+     */
+    public void disarmCheck(@NotNull Player defender, double attackStrengthScale) {
+        if (isSkillRNGSuccessful(SubSkillType.UNARMED_DISARM, mmoPlayer, attackStrengthScale)
                 && !hasIronGrip(defender)) {
             if (EventUtils.callDisarmEvent(defender).isCancelled()) {
                 return;
@@ -163,12 +173,23 @@ public class UnarmedManager extends SkillManager {
      * Handle the effects of the Berserk ability
      *
      * @param damage The amount of damage initially dealt by the event
+     * @deprecated use {@link #berserkDamage(double, double)} instead; this overload reads the
+     * live attack cooldown, which is unreliable during damage events on Paper 26.1.2+
      */
+    @Deprecated(forRemoval = true, since = "2.3.000")
     public double berserkDamage(double damage) {
-        damage =
-                ((damage * Unarmed.berserkDamageModifier) * mmoPlayer.getAttackStrength()) - damage;
+        return berserkDamage(damage, mmoPlayer.getAttackStrength());
+    }
 
-        return damage;
+    /**
+     * Handle the effects of the Berserk ability
+     *
+     * @param damage The amount of damage initially dealt by the event
+     * @param attackStrengthScale the committed attack strength of the hit, from 0.0 to 1.0
+     * @return the bonus damage granted by Berserk, negative for weak (uncharged) hits
+     */
+    public double berserkDamage(double damage, double attackStrengthScale) {
+        return ((damage * BERSERK_DMG_MODIFIER) * attackStrengthScale) - damage;
     }
 
     /**

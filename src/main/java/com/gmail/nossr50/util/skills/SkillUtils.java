@@ -19,6 +19,7 @@ import com.gmail.nossr50.util.ItemMetadataUtils;
 import com.gmail.nossr50.util.ItemUtils;
 import com.gmail.nossr50.util.Misc;
 import com.gmail.nossr50.util.Permissions;
+import com.gmail.nossr50.util.RecipeUtils;
 import com.gmail.nossr50.util.player.NotificationManager;
 import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.text.StringUtils;
@@ -29,6 +30,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -58,6 +60,11 @@ public final class SkillUtils {
      * Skill Stat Calculations
      */
 
+    /**
+     * @deprecated Skill commands use their own length display calculation; no remaining callers.
+     * Scheduled for removal.
+     */
+    @Deprecated(forRemoval = true, since = "2.3.000")
     public static String[] calculateLengthDisplayValues(Player player, float skillValue,
             PrimarySkillType skill) {
         int maxLength = mcMMO.p.getSkillTools()
@@ -131,8 +138,9 @@ public final class SkillUtils {
      * @return true if this is a valid skill, false otherwise
      */
     public static boolean isSkill(String skillName) {
-        return mcMMO.p.getGeneralConfig().getLocale().equalsIgnoreCase("en_US") ?
-                mcMMO.p.getSkillTools().matchSkill(skillName) != null : isLocalizedSkill(skillName);
+        // matchSkill accepts both localized and English names, keeping this consistent with
+        // the skill resolution the commands do right after this check
+        return mcMMO.p.getSkillTools().matchSkill(skillName) != null;
     }
 
     public static void sendSkillMessage(Player player, NotificationType notificationType,
@@ -142,7 +150,7 @@ public final class SkillUtils {
         for (Player otherPlayer : player.getWorld().getPlayers()) {
             if (otherPlayer != player && Misc.isNear(location, otherPlayer.getLocation(),
                     Misc.SKILL_MESSAGE_MAX_SENDING_DISTANCE)) {
-                NotificationManager.sendNearbyPlayersInformation(otherPlayer, notificationType, key,
+                NotificationManager.sendPlayerInformation(otherPlayer, notificationType, key,
                         player.getName());
             }
         }
@@ -267,29 +275,15 @@ public final class SkillUtils {
             return;
         }
 
-        Material type = itemStack.getType();
-        short maxDurability =
-                mcMMO.getRepairableManager().isRepairable(type) ? mcMMO.getRepairableManager()
-                        .getRepairable(type).getMaximumDurability() : type.getMaxDurability();
+        final int maxDurability = ItemUtils.getItemMaxDamage(itemStack);
         durabilityModifier = (int) Math.min(durabilityModifier / (
                         itemStack.getEnchantmentLevel(mcMMO.p.getEnchantmentMapper().getUnbreaking()) + 1),
                 maxDurability * maxDamageModifier);
 
-        itemStack.setDurability(
-                (short) Math.min(itemStack.getDurability() + durabilityModifier, maxDurability));
+        final int currentDamage = ItemUtils.getItemDamage(itemStack);
+        ItemUtils.setItemDamage(itemStack,
+            (int) Math.min(currentDamage + durabilityModifier, maxDurability));
     }
-
-    private static boolean isLocalizedSkill(String skillName) {
-        for (PrimarySkillType skill : PrimarySkillType.values()) {
-            if (skillName.equalsIgnoreCase(LocaleLoader.getString(
-                    StringUtils.getCapitalized(skill.toString()) + ".SkillName"))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 
     /**
      * Modify the durability of an ItemStack, using Armor specific formula for unbreaking enchant
@@ -305,16 +299,14 @@ public final class SkillUtils {
             return;
         }
 
-        Material type = itemStack.getType();
-        short maxDurability =
-                mcMMO.getRepairableManager().isRepairable(type) ? mcMMO.getRepairableManager()
-                        .getRepairable(type).getMaximumDurability() : type.getMaxDurability();
+        final int maxDurability = ItemUtils.getItemMaxDamage(itemStack);
         durabilityModifier = (int) Math.min(durabilityModifier * (0.6 + 0.4 / (
                         itemStack.getEnchantmentLevel(mcMMO.p.getEnchantmentMapper().getUnbreaking()) + 1)),
                 maxDurability * maxDamageModifier);
 
-        itemStack.setDurability(
-                (short) Math.min(itemStack.getDurability() + durabilityModifier, maxDurability));
+        final int currentDamage = ItemUtils.getItemDamage(itemStack);
+        ItemUtils.setItemDamage(itemStack,
+            (int) Math.min(currentDamage + durabilityModifier, maxDurability));
     }
 
     @Nullable
@@ -360,29 +352,28 @@ public final class SkillUtils {
             return 4;
         }
 
-        for (Iterator<? extends Recipe> recipeIterator = Bukkit.getServer().recipeIterator();
+        final ItemStack recipeItem = recipeMaterial != null ? new ItemStack(recipeMaterial) : null;
+
+        for (final Iterator<Recipe> recipeIterator =
+                RecipeUtils.safeRecipeIterator(Bukkit.getServer(), mcMMO.p.getLogger());
                 recipeIterator.hasNext(); ) {
-            Recipe bukkitRecipe = recipeIterator.next();
+            final Recipe bukkitRecipe = recipeIterator.next();
 
             if (bukkitRecipe.getResult().getType() != itemMaterial) {
                 continue;
             }
 
-            if (bukkitRecipe instanceof ShapelessRecipe) {
-                for (ItemStack ingredient : ((ShapelessRecipe) bukkitRecipe).getIngredientList()) {
-                    if (ingredient != null
-                            && (recipeMaterial == null || ingredient.getType() == recipeMaterial)
-                            && (ingredient.getType() == recipeMaterial)) {
-                        quantity += ingredient.getAmount();
+            if (bukkitRecipe instanceof ShapelessRecipe shapelessRecipe) {
+                for (RecipeChoice ingredient : shapelessRecipe.getChoiceList()) {
+                    if (ingredient != null && recipeItem != null && ingredient.test(recipeItem)) {
+                        quantity += 1;
                     }
                 }
-            } else if (bukkitRecipe instanceof ShapedRecipe) {
-                for (ItemStack ingredient : ((ShapedRecipe) bukkitRecipe).getIngredientMap()
+            } else if (bukkitRecipe instanceof ShapedRecipe shapedRecipe) {
+                for (RecipeChoice ingredient : shapedRecipe.getChoiceMap()
                         .values()) {
-                    if (ingredient != null
-                            && (recipeMaterial == null || ingredient.getType() == recipeMaterial)
-                            && (ingredient.getType() == recipeMaterial)) {
-                        quantity += ingredient.getAmount();
+                    if (ingredient != null && recipeItem != null && ingredient.test(recipeItem)) {
+                        quantity += 1;
                     }
                 }
             }
@@ -399,7 +390,6 @@ public final class SkillUtils {
      * @return true if the player has permission and has the skill unlocked
      */
     public static boolean canUseSubskill(Player player, @NotNull SubSkillType subSkillType) {
-        return Permissions.isSubSkillEnabled(player, subSkillType) && RankUtils.hasUnlockedSubskill(
-                player, subSkillType);
+        return Permissions.canUseSubSkill(player, subSkillType);
     }
 }
